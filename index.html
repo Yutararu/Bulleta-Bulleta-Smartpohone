@@ -39,8 +39,8 @@ const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 
 const MOBILE_MODE = true;
-const MOBILE_LOGICAL_WIDTH = 960;
-const MOBILE_LOGICAL_HEIGHT = 540;
+const MOBILE_LOGICAL_WIDTH = 1280;
+const MOBILE_LOGICAL_HEIGHT = 720;
 
 function resize() {
     if (MOBILE_MODE) {
@@ -170,10 +170,16 @@ function mobileCanvasPoint(touch) {
 }
 
 function mobileJoystickLayout() {
-    return { x: 100, y: 458, r: 58 };
+    return { x: 110, y: 655, r: 58 };
 }
 function mobileJumpLayout() {
-    return { x: 858, y: 458, r: 52 };
+    return { x: 1170, y: 655, r: 58 };
+}
+function mobileJoystickHitRadius() {
+    return 92;
+}
+function mobileJumpHitRadius() {
+    return 92;
 }
 function mobileIsPortrait() {
     return window.innerHeight > window.innerWidth;
@@ -198,12 +204,10 @@ function mobileUpdateGameplayTouch(touches) {
             const dx = p.x - joy.x;
             const dy = p.y - joy.y;
             const dist = Math.hypot(dx, dy);
-            if (dist <= joy.r * 1.8 || joystickActive) {
-                const nx = dist ? dx / dist : 0;
-                const amount = Math.min(dist, joy.r);
-                moveX = Math.max(-1, Math.min(1, nx * amount / joy.r));
-                joystickActive = true;
-            }
+            const nx = dist ? dx / dist : 0;
+            const amount = Math.min(dist, joy.r);
+            moveX = Math.max(-1, Math.min(1, nx * amount / joy.r));
+            joystickActive = true;
         } else {
             mobileTouch.joystickId = null;
         }
@@ -266,9 +270,9 @@ function handleTouch(e){
 
             const jd = Math.hypot(p.x - joy.x, p.y - joy.y);
             const bd = Math.hypot(p.x - jump.x, p.y - jump.y);
-            if (mobileTouch.joystickId === null && jd <= joy.r * 1.6) {
+            if (mobileTouch.joystickId === null && jd <= mobileJoystickHitRadius()) {
                 mobileTouch.joystickId = t.identifier;
-            } else if (mobileTouch.jumpId === null && bd <= jump.r * 1.5) {
+            } else if (mobileTouch.jumpId === null && bd <= mobileJumpHitRadius()) {
                 mobileTouch.jumpId = t.identifier;
             }
         }
@@ -2192,12 +2196,12 @@ function draw() {
             const jump = mobileJumpLayout();
             ctx.save();
             ctx.fillStyle='rgba(0,0,0,0.24)';
-            ctx.fillRect(0,410,canvas.width,130);
-            ctx.globalAlpha=0.34;ctx.fillStyle='#dc8c39';ctx.beginPath();ctx.arc(joy.x,joy.y,joy.r,0,Math.PI*2);ctx.fill();
-            ctx.globalAlpha=0.68;ctx.beginPath();ctx.arc(joy.x,joy.y,joy.r*0.38,0,Math.PI*2);ctx.fill();
-            ctx.globalAlpha=0.42;ctx.beginPath();ctx.arc(jump.x,jump.y,jump.r,0,Math.PI*2);ctx.fill();
+            ctx.fillRect(0,610,canvas.width,110);
+            ctx.globalAlpha=0.30;ctx.fillStyle='#dc8c39';ctx.beginPath();ctx.arc(joy.x,joy.y,joy.r,0,Math.PI*2);ctx.fill();
+            ctx.globalAlpha=0.72;ctx.beginPath();ctx.arc(joy.x,joy.y,joy.r*0.38,0,Math.PI*2);ctx.fill();
+            ctx.globalAlpha=0.38;ctx.beginPath();ctx.arc(jump.x,jump.y,jump.r,0,Math.PI*2);ctx.fill();
             ctx.globalAlpha=1;ctx.fillStyle='#000';ctx.textAlign='center';
-            ctx.font='22px GameFont, sans-serif';ctx.fillText('移動',joy.x,joy.y+7);ctx.fillText('JUMP',jump.x,jump.y+7);
+            ctx.font='30px GameFont, sans-serif';ctx.fillText('移動',joy.x,joy.y+10);ctx.fillText('JUMP',jump.x,jump.y+10);
             ctx.restore();
         }
         if(tutorialActive){
