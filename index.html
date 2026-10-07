@@ -14,8 +14,8 @@
             width:min(100vw, 177.7778vh);
             height:min(56.25vw, 100vh);
             background-color:#000;
-            image-rendering:pixelated;
-            image-rendering:crisp-edges;
+            image-rendering: pixelated;
+            -ms-interpolation-mode: nearest-neighbor;
             touch-action:none;
         }
         @font-face {
@@ -36,7 +36,10 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// ドット絵を補間せず、最近傍補間でくっきり描画する。
 ctx.imageSmoothingEnabled = false;
+ctx.webkitImageSmoothingEnabled = false;
+ctx.mozImageSmoothingEnabled = false;
 
 const MOBILE_MODE = true;
 const MOBILE_LOGICAL_WIDTH = 1280;
@@ -51,6 +54,8 @@ function resize() {
         canvas.height = window.innerHeight;
     }
     ctx.imageSmoothingEnabled = false;
+    ctx.webkitImageSmoothingEnabled = false;
+    ctx.mozImageSmoothingEnabled = false;
 }
 window.addEventListener('resize', resize);
 resize();
@@ -330,11 +335,13 @@ function drawSprite(img, cols, rows, index, x, y, w, h, flipX = false) {
 
     // 元画像の縦横比を維持し、指定領域内に収めて描画する。
     const fit = Math.min(w / sw, h / sh);
-    const dw = sw * fit;
-    const dh = sh * fit;
+    const dw = Math.max(1, Math.round(sw * fit));
+    const dh = Math.max(1, Math.round(sh * fit));
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.translate(x + w / 2, y + h / 2);
+    ctx.webkitImageSmoothingEnabled = false;
+    ctx.mozImageSmoothingEnabled = false;
+    ctx.translate(Math.round(x + w / 2), Math.round(y + h / 2));
     if (flipX) ctx.scale(-1, 1);
     ctx.drawImage(img, sx, sy, sw, sh, -dw / 2, -dh / 2, dw, dh);
     ctx.restore();
@@ -350,10 +357,12 @@ function drawRotatedSprite(img, cols, rows, index, cx, cy, w, h, angle) {
 
     ctx.save();
     ctx.imageSmoothingEnabled = false;
-    ctx.translate(cx, cy);
+    ctx.webkitImageSmoothingEnabled = false;
+    ctx.mozImageSmoothingEnabled = false;
+    ctx.translate(Math.round(cx), Math.round(cy));
     ctx.rotate(angle);
     const fit = Math.min(w / sw, h / sh);
-    const dw = sw * fit, dh = sh * fit;
+    const dw = Math.max(1, Math.round(sw * fit)), dh = Math.max(1, Math.round(sh * fit));
     ctx.drawImage(img, sx, sy, sw, sh, -dw/2, -dh/2, dw, dh);
     ctx.restore();
 }
